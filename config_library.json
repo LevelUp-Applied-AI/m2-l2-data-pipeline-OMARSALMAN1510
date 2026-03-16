@@ -10,5 +10,23 @@
     "revenue_by_category",
     "daily_revenue_trend",
     "avg_order_by_payment"
+  ],
+  "expectations": [
+    {
+      "type": "null_percentage",
+      "column": "quantity",
+      "max_null_pct": 20
+    },
+    {
+      "type": "value_range",
+      "column": "unit_price",
+      "min_value": 0,
+      "max_value": 1000
+    },
+    {
+      "type": "duplicate_date_store",
+      "date_col": "date",
+      "store_col": "store_id"
+    }
   ]
 }

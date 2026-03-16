@@ -2,8 +2,10 @@
 Lab 2 — Data Pipeline: Retail Sales Analysis
 Module 2 — Programming for AI & Data Science
 
-Extended for Challenge 2:
-- Config-driven pipeline using JSON
+Extended for:
+- Challenge 1: edge-case handling
+- Challenge 2: config-driven pipeline
+- Challenge 3: data validation framework
 """
 
 import os
@@ -13,13 +15,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from validate import run_validation, summarize_validation, save_validation_report, print_validation_report
 
-# ─── Default Configuration ────────────────────────────────────────────────────
 
 DEFAULT_CONFIG_PATH = "config_sales.json"
 
-
-# ─── Config Helpers ───────────────────────────────────────────────────────────
 
 def load_config(config_path=DEFAULT_CONFIG_PATH):
     """Load pipeline configuration from JSON file."""
@@ -46,8 +46,6 @@ def apply_fill_strategy(series, strategy):
 
     return series
 
-
-# ─── Pipeline Functions ───────────────────────────────────────────────────────
 
 def load_data(filepath):
     """Load records from a CSV file."""
@@ -201,9 +199,26 @@ def run_pipeline(config_path=DEFAULT_CONFIG_PATH):
     summary_groupby = config.get("summary_groupby", "product_category")
     charts = config.get("charts", [])
 
+    expectations = config.get("expectations", [])
+
     df = load_data(input_file)
+
+    # Validation before cleaning
+    raw_results = run_validation(df, expectations)
+    raw_report = summarize_validation(raw_results)
+    print_validation_report(raw_report, title="Validation Before Cleaning")
+    os.makedirs(output_dir, exist_ok=True)
+    save_validation_report(raw_report, os.path.join(output_dir, "validation_before.json"))
+
     df = clean_data(df, fillna_config=fillna_config)
     df = add_features(df)
+
+    # Validation after cleaning
+    cleaned_results = run_validation(df, expectations)
+    cleaned_report = summarize_validation(cleaned_results)
+    print_validation_report(cleaned_report, title="Validation After Cleaning")
+    save_validation_report(cleaned_report, os.path.join(output_dir, "validation_after.json"))
+
     summary = generate_summary(df, summary_groupby=summary_groupby)
 
     print("=== Summary ===")

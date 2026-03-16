@@ -18,6 +18,7 @@ import pytest
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from pipeline import load_data, clean_data, add_features, generate_summary
+from validate import run_validation, summarize_validation
 
 
 # ─── Base Test 1 ──────────────────────────────────────────────────────────────
@@ -152,3 +153,65 @@ def test_single_row_csv_handled_correctly(tmp_path):
     assert summary['record_count'] == 1
     assert summary['total_revenue'] == 1000.0
     assert summary['top_category'] == 'Electronics'
+
+
+# ─── Challenge 3 Test 1: Validation returns structured results ───────────────
+
+def test_validation_framework_returns_results():
+    """Validation framework should return a list of structured rule results."""
+    df = load_data("data/sales_records.csv")
+
+    expectations = [
+        {"type": "null_percentage", "column": "quantity", "max_null_pct": 10},
+        {"type": "value_range", "column": "unit_price", "min_value": 0, "max_value": 10000},
+        {"type": "duplicate_date_store", "date_col": "date", "store_col": "store_id"}
+    ]
+
+    results = run_validation(df, expectations)
+
+    assert isinstance(results, list)
+    assert len(results) == 3
+    assert all("rule" in r for r in results)
+    assert all("status" in r for r in results)
+    assert all("details" in r for r in results)
+
+
+# ─── Challenge 3 Test 2: Validation summary counts ───────────────────────────
+
+def test_validation_summary_counts():
+    """summarize_validation should count passed and failed rules correctly."""
+    sample_results = [
+        {"rule": "r1", "status": "pass", "details": "ok"},
+        {"rule": "r2", "status": "fail", "details": "bad"},
+        {"rule": "r3", "status": "pass", "details": "ok"}
+    ]
+
+    report = summarize_validation(sample_results)
+
+    assert report["total_rules"] == 3
+    assert report["passed"] == 2
+    assert report["failed"] == 1
+    assert len(report["results"]) == 3
+
+
+# ─── Challenge 3 Test 3: Cleaning should not worsen validation ───────────────
+
+def test_validation_improves_after_cleaning():
+    """Cleaning should keep or improve validation results for null checks."""
+    df = load_data("data/sales_records.csv")
+
+    expectations = [
+        {"type": "null_percentage", "column": "quantity", "max_null_pct": 10},
+        {"type": "null_percentage", "column": "unit_price", "max_null_pct": 10}
+    ]
+
+    raw_results = run_validation(df, expectations)
+    raw_report = summarize_validation(raw_results)
+
+    cleaned = clean_data(df, fillna_config={"quantity": "median", "unit_price": "median"})
+    enriched = add_features(cleaned)
+
+    cleaned_results = run_validation(enriched, expectations)
+    cleaned_report = summarize_validation(cleaned_results)
+
+    assert cleaned_report["failed"] <= raw_report["failed"]
