@@ -9,9 +9,15 @@ Write your own pytest tests here. You must implement at least 3 test functions:
 The autograder will run your tests as part of the CI check.
 """
 
+import os
+import sys
 import pandas as pd
 import numpy as np
 import pytest
+
+# Fix import path for CI (GitHub Actions)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from pipeline import load_data, clean_data, add_features
 
 
@@ -54,14 +60,14 @@ def test_add_features_creates_revenue():
     """add_features should add a 'revenue' column equal to quantity * unit_price."""
     df = load_data('data/sales_records.csv')
     cleaned = clean_data(df)
-    featured = add_features(cleaned)
+    enriched = add_features(cleaned)
 
-    assert 'revenue' in featured.columns
+    assert 'revenue' in enriched.columns
 
     expected_revenue = cleaned['quantity'] * cleaned['unit_price']
 
     pd.testing.assert_series_equal(
-        featured['revenue'].reset_index(drop=True),
+        enriched['revenue'].reset_index(drop=True),
         expected_revenue.reset_index(drop=True),
         check_names=False
     )
