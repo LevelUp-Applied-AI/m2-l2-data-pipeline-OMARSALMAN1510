@@ -1,0 +1,22 @@
+{
+  "total_rules": 3,
+  "passed": 3,
+  "failed": 0,
+  "results": [
+    {
+      "rule": "quantity_null_percentage",
+      "status": "pass",
+      "details": "0.00% null values (max allowed: 20%)"
+    },
+    {
+      "rule": "unit_price_value_range",
+      "status": "pass",
+      "details": "0 invalid values outside range [0, 1000]"
+    },
+    {
+      "rule": "duplicate_date_within_store",
+      "status": "pass",
+      "details": "0 duplicate rows found for (date, store_id)"
+    }
+  ]
+}
