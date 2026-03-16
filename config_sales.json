@@ -1,0 +1,37 @@
+{
+  "input_file": "data/sales_records.csv",
+  "output_dir": "output",
+  "fillna": {
+    "quantity": "median",
+    "unit_price": "median"
+  },
+  "summary_groupby": "product_category",
+  "charts": [
+    "revenue_by_category",
+    "daily_revenue_trend",
+    "avg_order_by_payment"
+  ],
+  "expectations": [
+    {
+      "type": "null_percentage",
+      "column": "quantity",
+      "max_null_pct": 10
+    },
+    {
+      "type": "null_percentage",
+      "column": "unit_price",
+      "max_null_pct": 10
+    },
+    {
+      "type": "value_range",
+      "column": "unit_price",
+      "min_value": 0,
+      "max_value": 10000
+    },
+    {
+      "type": "duplicate_date_store",
+      "date_col": "date",
+      "store_col": "store_id"
+    }
+  ]
+}

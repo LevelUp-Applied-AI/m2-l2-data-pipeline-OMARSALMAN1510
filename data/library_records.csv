@@ -1,0 +1,7 @@
+date,store_id,product_category,quantity,unit_price,payment_method
+2026-01-01,1,Fiction,2,15.5,Cash
+2026-01-02,2,Science,1,22.0,Credit Card
+2026-01-03,3,History,3,18.0,Cash
+2026-01-04,1,Fiction,,14.0,Mobile Payment
+2026-01-05,2,Science,2,,Bank Transfer
+2026-01-06,3,Comics,4,8.5,Cash
