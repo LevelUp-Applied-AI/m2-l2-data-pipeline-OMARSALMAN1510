@@ -1,0 +1,14 @@
+{
+  "input_file": "data/library_records.csv",
+  "output_dir": "output_library",
+  "fillna": {
+    "quantity": "mean",
+    "unit_price": "zero"
+  },
+  "summary_groupby": "product_category",
+  "charts": [
+    "revenue_by_category",
+    "daily_revenue_trend",
+    "avg_order_by_payment"
+  ]
+}
